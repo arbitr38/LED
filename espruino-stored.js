@@ -161,7 +161,7 @@ consoleLED.innerHTML = 'Chaser';
 
 var ledState = true;
 var arr = new Uint8ClampedArray(256*3);
-// pinMode(NodeMCU.D6, 'input_pullup'); // для кнопки
+pinMode(NodeMCU.D4, 'input_pullup'); // для кнопки
 
 
 ///////  CHASER
