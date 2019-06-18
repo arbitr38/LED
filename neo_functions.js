@@ -28,3 +28,10 @@ for(var i=0; i< arr.length;){
 require("neopixel").write(NodeMCU.D1, arr);
 }
 
+
+try {
+  fs.readdirSync();
+ } catch (e) { //'Uncaught Error: Unable to mount media : NO_FILESYSTEM'
+  console.log('Formatting FS - only need to do once');
+  E.flashFatFS({ format: true });
+}
