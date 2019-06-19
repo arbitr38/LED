@@ -1,9 +1,6 @@
 var wifi = require("Wifi");
 var clients = [];
 
-//var WIFI_NAME = "cisco.irk.ru";
-//var WIFI_OPTIONS = { password : "Ve!c0dinC1n@" };
-
 var WIFI_NAME = "vaduga";
 var WIFI_OPTIONS = { password : "9501203230" };
 
