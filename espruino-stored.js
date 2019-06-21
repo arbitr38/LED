@@ -1,6 +1,9 @@
 var wifi = require("Wifi");
 var clients = [];
 
+//var WIFI_NAME = "cisco.irk.ru";
+//var WIFI_OPTIONS = { password : "Ve!c0dinC1n@" };
+
 var WIFI_NAME = "vaduga";
 var WIFI_OPTIONS = { password : "9501203230" };
 
@@ -87,7 +90,7 @@ break;
   };
 
   clearAll.onclick = evt => {
-    ws.send("clearAll");
+    ws.send("clear");
 consoleLED.innerHTML = '';
   };
 
@@ -158,62 +161,61 @@ consoleLED.innerHTML = 'Chaser';
 
 var ledState = true;
 var arr = new Uint8ClampedArray(256*3);
-pinMode(NodeMCU.D4, 'input_pullup'); // для кнопки
+pinMode(D18, 'input_pullup'); // для кнопки
 
 
 ///////  CHASER
 function chaser() {
-var led_count = 150;
-var rgb = new Uint8ClampedArray(led_count * 3);
-
-var pos = 0;
+var led_count = 250;
+var pos = 50;
+  clear();
   
 function getPattern() {
   pos = (pos + 1) % led_count;
 
-  rgb[pos * 3 + 0] = 170; // r
-  rgb[pos * 3 + 1] = 140 ;  // g
-  rgb[pos * 3 + 2] = 55; // b
+  arr[pos * 3 + 0] = 70; // r
+  arr[pos * 3 + 1] = 40 ;  // g
+  arr[pos * 3 + 2] = 55; // b
 
   for(var i = 0; i < led_count * 3; i++)
-    rgb[i] *= 0.9;
+    arr[i] *= 0.9;
 
-  return rgb;
+  return arr;
 }
   
   
 var chaser = setInterval(function() {
-  require("neopixel").write(NodeMCU.D1, getPattern());
-}, 10);
+  require("neopixel").write(D23, getPattern());
+}, 90);
   
   
-setTimeout(function(){clearInterval(chaser);arr.fill(0);require("neopixel").write(NodeMCU.D1, arr);}, 7000); 
+setTimeout(function(){clearInterval(chaser);arr.fill(0);require("neopixel").write(D23, arr);}, 7000); 
   
 
 }
 
 ////// RAINBOW
 function rainbow() {
-var led_count = 80;
+var led_count = 255;
 var rgb = new Uint8ClampedArray(led_count * 3);
 
 var pos = 0;
 function getPattern() {
   pos++;
   for (var i=0;i<rgb.length;) {
-    rgb[i++] = (1 + Math.sin((i+pos)*0.1324)) * 127;
-    rgb[i++] = (1 + Math.sin((i+pos)*0.1654)) * 127;
-    rgb[i++] = (1 + Math.sin((i+pos)*0.1)) * 127;
+    rgb[i++] = (1 + Math.sin((i+pos)*0.1324)) * 12;
+    rgb[i++] = (1 + Math.sin((i+pos)*0.1654)) * 12;
+    rgb[i++] = (1 + Math.sin((i+pos)*0.1)) * 12;
   }
   return rgb;
 }
   
 var rain = setInterval(function() {
-  require("neopixel").write(NodeMCU.D1, getPattern());
+  require("neopixel").write(D23, getPattern());
 }, 50);
   
   
-setTimeout(function(){clearInterval(rain);arr.fill(0);require("neopixel").write(NodeMCU.D1, arr);}, 5000); 
+setTimeout(function(){clearInterval(rain);arr.fill(0);require("neopixel").write(D23, arr);}, 5000); 
   
 }
 
@@ -228,7 +230,7 @@ for(var i=100; i< 200;){
   arr[i++] = 150;
 }
 
-require("neopixel").write(NodeMCU.D1, arr);
+require("neopixel").write(D23, arr);
 }
 
 
@@ -245,12 +247,12 @@ function wsHandler(ws) {
   ws.on('message', msg => {
     console.log(msg);
     ledState = ledState ? false : true;  
-//    digitalWrite(D2, ledState); // system LED
-    digitalWrite(NodeMCU.D3, !ledState); // beeper + lamp
+    digitalWrite(D2, !ledState); // system LED
+    digitalWrite(D19, !ledState); // beeper + lamp
     switch (msg) {
-  case "clearAll":
+  case "clear":
     arr.fill(0);
-    require("neopixel").write(NodeMCU.D1, arr);
+    require("neopixel").write(D23, arr);
     
     break;
   case "rainbow":
@@ -262,7 +264,7 @@ function wsHandler(ws) {
   default:
     let s=msg.split(',');
     arr.set([s[2],s[1],s[3]], s[0]*3);
-  require("neopixel").write(NodeMCU.D1, arr);
+  require("neopixel").write(D23, arr);
     break;
 }
     
@@ -277,6 +279,11 @@ function wsHandler(ws) {
   });
 }
 
+function clear() { 
+arr.fill(0);
+    require("neopixel").write(D23, arr);
+}
+
 // Send msg to all current websocket connections
 function broadcast(msg) {
   clients.forEach(cl => cl.send(msg));
@@ -284,8 +291,8 @@ function broadcast(msg) {
 
 // Watch for button events (rising and falling)
 setWatch(evt => {
-broadcast(digitalRead(NodeMCU.D4) == 1 ? 'UP' : 'DOWN');
-}, NodeMCU.D4, {repeat: true, edge: 'both', debounce: 50});
+broadcast(digitalRead(D18) == 1 ? 'UP' : 'DOWN');
+}, D18, {repeat: true, edge: 'both', debounce: 50});
 
 
 
