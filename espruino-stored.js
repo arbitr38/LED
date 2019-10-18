@@ -161,7 +161,7 @@ consoleLED.innerHTML = 'Chaser';
 
 var ledState = true;
 var arr = new Uint8ClampedArray(256*3);
-pinMode(D18, 'input_pullup'); // для кнопки
+//pinMode(D18, 'input_pullup'); // для кнопки
 
 
 ///////  CHASER
@@ -185,11 +185,11 @@ function getPattern() {
   
   
 var chaser = setInterval(function() {
-  require("neopixel").write(D23, getPattern());
+  require("neopixel").write(NodeMCU.D1, getPattern());
 }, 90);
   
   
-setTimeout(function(){clearInterval(chaser);arr.fill(0);require("neopixel").write(D23, arr);}, 7000); 
+setTimeout(function(){clearInterval(chaser);arr.fill(0);require("neopixel").write(NodeMCU.D1, arr);}, 7000); 
   
 
 }
@@ -211,11 +211,11 @@ function getPattern() {
 }
   
 var rain = setInterval(function() {
-  require("neopixel").write(D23, getPattern());
+  require("neopixel").write(NodeMCU.D1, getPattern());
 }, 50);
   
   
-setTimeout(function(){clearInterval(rain);arr.fill(0);require("neopixel").write(D23, arr);}, 5000); 
+setTimeout(function(){clearInterval(rain);arr.fill(0);require("neopixel").write(NodeMCU.D1, arr);}, 5000); 
   
 }
 
@@ -230,7 +230,7 @@ for(var i=100; i< 200;){
   arr[i++] = 150;
 }
 
-require("neopixel").write(D23, arr);
+require("neopixel").write(NodeMCU.D1, arr);
 }
 
 
@@ -248,11 +248,11 @@ function wsHandler(ws) {
     console.log(msg);
     ledState = ledState ? false : true;  
     digitalWrite(D2, !ledState); // system LED
-    digitalWrite(D19, !ledState); // beeper + lamp
+   // digitalWrite(D19, !ledState); // beeper + lamp
     switch (msg) {
   case "clear":
     arr.fill(0);
-    require("neopixel").write(D23, arr);
+    require("neopixel").write(NodeMCU.D1, arr);
     
     break;
   case "rainbow":
@@ -264,7 +264,7 @@ function wsHandler(ws) {
   default:
     let s=msg.split(',');
     arr.set([s[2],s[1],s[3]], s[0]*3);
-  require("neopixel").write(D23, arr);
+  require("neopixel").write(NodeMCU.D1, arr);
     break;
 }
     
@@ -281,7 +281,7 @@ function wsHandler(ws) {
 
 function clear() { 
 arr.fill(0);
-    require("neopixel").write(D23, arr);
+    require("neopixel").write(NodeMCU.D1, arr);
 }
 
 // Send msg to all current websocket connections
@@ -290,9 +290,9 @@ function broadcast(msg) {
 }
 
 // Watch for button events (rising and falling)
-setWatch(evt => {
-broadcast(digitalRead(D18) == 1 ? 'UP' : 'DOWN');
-}, D18, {repeat: true, edge: 'both', debounce: 50});
+//setWatch(evt => {
+//broadcast(digitalRead(D18) == 1 ? 'UP' : 'DOWN');
+//}, D18, {repeat: true, edge: 'both', debounce: 50});
 
 
 
